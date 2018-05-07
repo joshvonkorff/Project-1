@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sklearn.cluster
 import scipy.stats
+import matplotlib.pyplot as plt
 
 def represents_int(s):
     '''
@@ -172,6 +173,66 @@ def get_subc_list(X, labels):
   subc_list = [subcluster(subX) for subX in subXlist]
   return subc_list
 
+def plot_pair_respondents(m, n, labels, matrix, spec_series, all_nums):
+  '''
+  Plot respondents m and n's z-scores
+  '''
+  clusterlist = [[a[0] for a in enumerate(labels) if a[1] == i] for i in range(0, 4)]
+
+  plt.figure(figsize=(10,10))
+
+  col = ['black', 'blue', 'red', 'orange']
+
+  for i, c in enumerate(clusterlist):
+    plt.plot(matrix[c,m], matrix[c,n], 'o', label = 'cluster ' + str(i), color = col[i])
+
+  plt.title("Four clusters with respondents " + str(m) + " and " + str(n))
+  plt.legend()
+  plt.xlabel("z score of respondent " + str(m), size='large')
+  plt.ylabel("z score of respondent " + str(n), size='large')
+
+  #print(clusterlist)
+  #print(spec_series[all_nums])
+
+  for c in enumerate(clusterlist):
+    for i in c[1]:
+      plt.annotate(spec_series.iloc[all_nums[i]], (matrix[i,m] + 0.05, matrix[i,n]), color = col[c[0]])
+
+  plt.savefig("respondents-" + str(m) + "-" + str(n) + ".jpg")
+
+def plot_pair_items(m, n, mparity, nparity, matrix, spec_series, all_nums):
+  '''
+  Plot survey items m and n's z-scores
+  There should almost always be points at z = 0; these correspond to missing data. 
+  '''
+
+  plt.figure(figsize=(10,8))
+
+  matm = matrix[m, :] if mparity == 1 else -matrix[m, :]
+  matn = matrix[n, :] if nparity == 1 else -matrix[n, :]
+
+  nonzero = list(zip(*[a for a in zip(matm, matn) if a[0] != 0 and a[1] != 0]))
+  mzer = zip(*[a for a in zip(matm, matn) if a[0] == 0 and a[1] != 0])
+  nzer = zip(*[a for a in zip(matm, matn) if a[0] != 0 and a[1] == 0])
+  zer = zip(*[a for a in zip(matm, matn) if a[0] == 0 and a[1] == 0])    
+
+  alpha = 0.01
+  z = 'green'
+  nz = 'blue'
+  plt.plot(*nonzero, color = nz, marker = 'o', alpha = alpha, linestyle='None')
+  plt.plot(*mzer, color=z, marker='o', alpha = alpha, linestyle='None')
+  plt.plot(*nzer, color=z, marker='o', alpha = alpha, linestyle='None')
+  plt.plot(*zer, color=z, marker='o', alpha = alpha, linestyle='None')
+
+  x, y = matm, matn
+  plt.plot(np.unique(x), np.poly1d(np.polyfit(x, y, 1))(np.unique(x)), 'b-')
+
+  plt.title("Correlation of: " + spec_series.iloc[all_nums[m]] + " and " + spec_series.iloc[all_nums[n]])
+  plt.xlabel("z score of " + spec_series.iloc[all_nums[m]], size='large')
+  plt.ylabel("z score of " + spec_series.iloc[all_nums[n]], size='large')
+    
+  plt.savefig("items-" + str(m) + "-" + str(n) + ".jpg")
+
 print("Note: this program will write the results to output.txt")
 print("Reading csv file ...")
 
@@ -285,4 +346,7 @@ with open("output.txt", "w") as file:
       msg = str("A" if i==1 else "B") + " " + str(x[0:3])
       print(msg)
       file.write(msg + "\n")
-      
+
+plot_pair_respondents(0, 1, labels, X, spec_series, all_nums)
+
+plot_pair_items(20, 24, -1, 1, X, spec_series, all_nums)      
