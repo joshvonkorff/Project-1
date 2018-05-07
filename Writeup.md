@@ -1,6 +1,6 @@
 ## Modernization and democracy
 
-This project is based on work by political scientists Ronald Inglehart and Christian Welzel.  They were interested in understanding how to promote democracy throughout the world.  They create a survey called the "World Values Survey" to understand this topic better.
+This project is based on work by political scientists Ronald Inglehart and Christian Welzel.  They were interested in understanding how to promote democracy throughout the world.  They created a survey called the "World Values Survey" to understand this topic better.
 
 Based on the survey, Inglehart proposed that democracy will come with material wealth: as people become wealthier, they can afford to be more tolerant, for example.  Inglehart is so confident of this claim that he sometimes writes as if democracy and wealth are the same thing.
 
